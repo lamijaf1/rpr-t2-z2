@@ -38,20 +38,74 @@ public class Interval {
     }
     public static Interval intersect(Interval i1, Interval i2) {
         Interval i = new Interval();
-        if (equals(i1,i2)) return i1;
-        if (provjeraIntervala(i1) == true && provjeraIntervala(i2) == true && DaLiGraniceUkljucene(i1, i2) == true) {
-            if (i1.getPocetna() <= i2.getPocetna()) {
+        if (equals(i1,i2)==true) return i1;
+        if(provjeraIntervala(i1)==false || provjeraIntervala(i2)==false) return i;
+        Interval temp=new Interval();
+        //if(i2.getPocetna()>i1.getPocetna()) {temp=i1;i1=i2;i2=temp;}
+        if (i1.getPocetna() > i2.getPocetna()) {
+                i.setPocetna(i1.getPocetna());
+                i.setPripada1(false);
+                if ( i2.getKrajnja() < i1.getKrajnja()){
+                    i.setKrajnja(i2.getKrajnja());
+                    i.setPripada2(false);
+                }else if(GraniceKraj(i1, i2)==true && i2.getKrajnja()<= i1.getKrajnja()){
+                    i.setKrajnja(i2.getKrajnja());
+                    i.setPripada2(true);
+                }
+        }
+        else if (i1.getPocetna()<=i2.getPocetna()) {
                 i.setPocetna(i2.getPocetna());
-                if (i2.getKrajnja() >= i1.getKrajnja()) i.setKrajnja(i1.getKrajnja());
+                if(GranicePoc(i1,i2)==true)i.setPripada1(true);
+                else i.setPripada1(false);
+                if (i2.getKrajnja() >= i1.getKrajnja()) {
+                    i.setKrajnja(i1.getKrajnja());
+                    if(GraniceKraj(i1,i2)==true) i.setPripada2(true);
+                    else i.setPripada2(false);
+                }
+                else if(i2.getKrajnja()<i1.getKrajnja()){
+                    i.setKrajnja(i2.getKrajnja());
+                     i.setPripada2(true);
+                }
             }
-        } else if (provjeraIntervala(i1) == true && provjeraIntervala(i2) == false && DaLiGraniceUkljucene(i1,i2)==false) {
-            if (i1.getPocetna() < i2.getPocetna()) {
-                i.setPocetna(i2.getPocetna());
-                if (i2.getKrajnja() >= i1.getKrajnja()) i.setKrajnja(i1.getKrajnja());
-            }
-        } else intersect(i2, i1);
+        else  i= i1.intersect(i2);
         return i;
     }
+    public Interval intersect(Interval i1){
+        Interval i = new Interval();
+        if (equals(i1,this)==true) return i1;
+        if(provjeraIntervala(i1)==false || provjeraIntervala(this)==false) return i;
+        Interval temp=new Interval();
+        if (i1.getPocetna() >=this.getPocetna()) {
+            i.setPocetna(i1.getPocetna());
+            if(GranicePoc(i1,this)==true)i.setPripada1(true);
+            else i.setPripada1(false);
+            if ( this.getKrajnja() <= i1.getKrajnja()){
+                i.setKrajnja(this.getKrajnja());
+                if(GraniceKraj(i1,this)==true)i.setPripada2(true);
+                else i.setPripada2(false);
+            }else if( this.getKrajnja()> i1.getKrajnja()){
+                i.setKrajnja(i1.getKrajnja());
+                if(GraniceKraj(i1,this)==true)i.setPripada2(true);
+                else i.setPripada2(false);
+            }
+        }
+        else if (i1.getPocetna()<=this.getPocetna()) {
+            i.setPocetna(this.getPocetna());
+            if(GranicePoc(i1,this)==true)i.setPripada1(true);
+            else i.setPripada1(false);
+            if (this.getKrajnja() >= i1.getKrajnja()) {
+                i.setKrajnja(i1.getKrajnja());
+                if(GraniceKraj(i1,this)==true) i.setPripada2(true);
+                else i.setPripada2(false);
+            }
+            else if(this.getKrajnja()<i1.getKrajnja()){
+                i.setKrajnja(this.getKrajnja());
+                i.setPripada2(true);
+            }
+        }
+        return i;
+    }
+
     public boolean equals (Interval i1){
         if(i1.isPripada1()==this.isPripada1()&& i1.isPripada2()==this.isPripada2())
         if( i1.getPocetna()==this.getPocetna()&& i1.getKrajnja()==this.getKrajnja())return true;
@@ -63,12 +117,14 @@ public class Interval {
             if(i1.getPocetna()==i2.getPocetna()&& i1.getKrajnja()==i2.getKrajnja())return true;
         return false;
     }
-    public static boolean DaLiGraniceUkljucene(Interval i1, Interval i2){
-        if(i1.isPripada2()==true && i1.isPripada1()== true && i2.isPripada1()==true && i2.isPripada2()==true) return true;
+    public static boolean GranicePoc(Interval i1, Interval i2){
+        if(i1.isPripada1()==true && i2.isPripada1()== true )return true;
         return false;
     }
-
-
+    public static boolean GraniceKraj(Interval i1 , Interval i2){
+        if(i2.isPripada2()==true && i1.isPripada2()==true) return true;
+        return false;
+    }
     @Override
     public String toString(){
         String pocetna="(", krajnja=")";
